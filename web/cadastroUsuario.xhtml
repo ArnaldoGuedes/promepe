@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <body>
+
+        <ui:composition template="./templateInicio.xhtml">
+
+            <ui:define name="content">
+                <div align="center">
+                    <h:form id="formularioCadastro" title="Cadastro" acceptcharset="ISO-8859-1">
+                        
+                        <p:panelGrid id="pnlCadastro" columns="3" styleClass="semBorda">
+                            <f:facet name="header">
+                                <h:outputText value="Cadastro"/>
+                            </f:facet>
+
+                            <h:outputLabel for="txtnome" value="Nome: *"/>
+                            <p:inputText id="txtnome" lang="pt-Br" label="Nome" maxlength="35" size="35" required="true" value="#{cadastroUsuarioController.usuario.nome}"
+                                         requiredMessage="O campo nome é de preenchimento obrigatório!" title="Nome" validator="#{cadastroUsuarioController.validarEspacoBranco}"
+                                         validatorMessage="O nome não pode conter numeros ou caracteres especiais!">
+                                <f:validateRegex  pattern="^([A-Z,a-z, ,ã,á,à,â,ê,í,ú,õ,é,ü]){0,50}$" for="txtnome"/>
+                                <p:watermark for="txtnome" value="Digite seu nome" />
+                            </p:inputText>
+                            <p:message for="txtnome" display="icon"/>
+
+                            <h:outputLabel for="txtemail" value="E-Mail: *"/>
+                            <p:inputText id="txtemail" label="E-Mail" size="35" required="true" value="#{cadastroUsuarioController.usuario.email}"
+                                         requiredMessage="O campo e-mail é de preenchimento obrigatório!" title="E-Mail" validator="#{cadastroUsuarioController.validarEspacoBranco}"
+                                         validatorMessage="E-Mail invalido!"
+                                         onkeyup="this.value = this.value.toLowerCase(); this.value = this.value.trim();"> 
+                                <f:validateLength minimum="5"/>
+                                <p:watermark for="txtemail" value="Digite seu e-mail" />                                       
+                            </p:inputText>
+                            <p:message for="txtemail" display="icon"/>                            
+
+                            <h:outputLabel for="txtsenha" value="Senha: *"/>
+                            <p:password id="txtsenha" label="Senha" size="35" required="true" value="#{cadastroUsuarioController.usuario.senha}" 
+                                        feedback="true" weakLabel="Fácil" goodLabel="Médio" strongLabel="Difícil" match="confsenha" 
+                                        promptLabel="Digite a senha" requiredMessage="O campo senha é de preenchimento obrigatório!" title="Conferir Senha" maxlength="14"
+                                        validatorMessage="Os dois campos de senhas devem ser iguais e ter no minimo 6 caracteres!" validator="#{cadastroUsuarioController.validarEspacoBranco}" >
+                                <f:validateLength minimum="6"/>
+                                <p:watermark for="txtsenha" value="Minimo 6 caracteres" />                                       
+                            </p:password>
+                            <p:message for="txtsenha" display="icon"/>
+
+                            <h:outputLabel for="confsenha" value="Repita Senha: *"/>
+                            <p:password id="confsenha" label="Repita Senha" size="35" required="true" value="#{cadastroUsuarioController.usuario.senha}" maxlength="14"
+                                        requiredMessage="O campo confirmação da senha é de preenchimento obrigatório!" title="Confirmação da Senha">
+                                <p:watermark for="confsenha" value="Repita a senha" />                                   
+                            </p:password>
+                            <p:message for="confsenha" display="icon"/>                            
+
+                            <h:outputLabel for="lstSexo" value="Sexo: *"/>                        
+                            <p:selectOneMenu id="lstSexo" required="true" value="#{cadastroUsuarioController.usuario.sexo}">  
+                                <f:selectItem itemLabel="Masculino" itemValue="M"/>  
+                                <f:selectItem itemLabel="Feminino" itemValue="F" />  
+                            </p:selectOneMenu>  
+                            <p:message for="lstSexo" display="icon"/>
+
+                            <h:outputLabel for="txtdataNascimento" value="Data Nascimento: *"/>
+                            <p:calendar id="txtdataNascimento" size="10" locale="pt" label="DataNascimento" pattern="dd/MM/yyyy" required="true" value="#{cadastroUsuarioController.usuario.dataNascimento}" 
+                                        requiredMessage="O campo data de nascimento é de preenchimento obrigatório!" 
+                                        title="Data de Nascimento" mindate="01/01/1900" showButtonPanel="true" > 
+                                <p:watermark for="txtdataNascimento" value="dd/mm/aaaa" />       
+                            </p:calendar>
+                            <p:message for="txtdataNascimento" display="icon"/>
+                            
+        
+                            <p:commandLink value="Li e aceito o termo de uso." title="Termo de Uso"  id="cmdlTermo" onclick="termo.show(); return null;"  />
+                            <p:selectBooleanButton id="ckContrato" offLabel="Não" onLabel="Sim" value="#{cadastroUsuarioController.termo}" />
+                            <p:message for="ckContrato" display="icon"/>
+                            
+                            <f:facet name="footer">
+                                <p:commandButton value="Cadastrar" id="btnCadastrar" label="Cadastrar" ajax="false" 
+                                                 title="Cadastrar" action="#{cadastroUsuarioController.cadastrarUsuario}"/>
+                                <p:spacer height="15" width="15"/>
+                                
+                                <h:outputText id="lblpreenchimentoObrigatorio" value="(*) Campos de preenchimento obrigatório"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </h:form>
+        
+                    <!-- TERMO DE USO -->
+                    <p:dialog id="dlgTermo" header="Termo de Uso" closable="true" draggable="false"
+                              modal="true" resizable="false" widgetVar="termo">
+                        <p:scrollPanel style="height: 300px; width: 500px">
+                            <h:panelGrid columns="1">
+                                <h:outputText style="font-weight: bold; font-size: 15px;" value="'Termo de Uso'"/>
+                                <p:separator/>
+                                <h:outputText value="1 - Fica-se claro que se trata de um PROTÓTIPO de sistema e pode conter possíveis bugs."/>
+                                <h:outputText value="2 - As informações fornecidas são de total responsabilidade do usuário, insentando
+                                              o sistema da mesma."/>
+                                <h:outputText style="font-weight: bolder" value="3 - Não insira informações falsas, pois estara prejudicando a si mesmo."/>
+                            </h:panelGrid>
+                        </p:scrollPanel>
+                    </p:dialog>
+                </div>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="emergenciaAlergia" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c50aaf66-7030-4d25-85ef-cc4a838865ce">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="usuarioNome" class="java.lang.String"/>
+	<field name="nome" class="java.lang.String"/>
+	<field name="descricao" class="java.lang.String"/>
+	<field name="ultimaReacao" class="java.util.Date"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="72">
+			<frame>
+				<reportElement uuid="9596ef6d-dc76-4ec0-a930-4082e154baef" mode="Opaque" x="-20" y="-20" width="595" height="92" backcolor="#D2EAFF"/>
+				<staticText>
+					<reportElement uuid="9ab94a76-32c1-41d2-b66e-f0a3185f1b82" x="128" y="0" width="360" height="43" forecolor="#000066"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="34" isBold="true"/>
+					</textElement>
+					<text><![CDATA[PROMEPE]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="8bebbe2d-ac22-49c3-97ba-af596dabc190" x="488" y="43" width="107" height="31" forecolor="#000066"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="18" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Alergias]]></text>
+				</staticText>
+				<image>
+					<reportElement uuid="50c0fa00-8deb-45ea-9b52-69eee2b39b66" x="20" y="20" width="90" height="72"/>
+					<imageExpression><![CDATA["logo.gif"]]></imageExpression>
+				</image>
+				<staticText>
+					<reportElement uuid="e79796f8-eb58-40d9-afcd-f0a37fbc211b" x="128" y="63" width="360" height="29"/>
+					<textElement textAlignment="Center">
+						<font size="8" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Todas as informações aqui contidas, são de inteira
+responsabilidade do usuário, o Promepe não se responsabiliza por 
+danos ou atitudes tomadas com base em tais informações.]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="d3469044-c8b0-4d80-a02e-412f0b1456b6" x="128" y="43" width="360" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$P{usuarioNome}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="13"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="21">
+			<line>
+				<reportElement uuid="4a268338-8a65-4293-8be5-380be63cdad8" x="-20" y="20" width="595" height="1" forecolor="#666666"/>
+			</line>
+			<staticText>
+				<reportElement uuid="7e8e67df-1553-409c-8452-a4605994c670" x="0" y="1" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1904bb72-ea56-4ea9-a7f5-c310bb39f39f" x="100" y="1" width="355" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descrição]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c03370ec-030f-46af-b322-2629e53ab3ac" x="455" y="1" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ultima Reação]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<line>
+				<reportElement uuid="cf009096-3dd2-4b37-86ae-cc1e75f48106" positionType="FixRelativeToBottom" x="0" y="19" width="555" height="1"/>
+			</line>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="217dc190-4a07-4f84-839a-1e83c212e555" x="0" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nome}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="484b44cc-a5f2-4066-9a8f-0b139bd8eedc" x="100" y="0" width="355" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{descricao}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+				<reportElement uuid="48c0ae19-bc4b-4b94-8a34-b64b8d37d752" x="455" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ultimaReacao}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="17">
+			<textField>
+				<reportElement uuid="dc2a2f10-35ba-4e24-b616-64afc57cf3e9" mode="Opaque" x="0" y="4" width="515" height="13" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="7c6e89f8-33c1-4091-9710-2fd013197a4a" mode="Opaque" x="515" y="4" width="40" height="13" backcolor="#E6E6E6"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="0bc61903-6606-44fa-b927-15accc36fd65" x="0" y="4" width="100" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

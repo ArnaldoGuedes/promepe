@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./templeteAreaPessoal.xhtml">
+
+            <ui:define name="content">
+                <div align="center">
+
+                    <h:form id="formVacinas" title="Vacinas">
+
+                        <!--Todas as Vacinas-->
+                        <p:dataTable id="vacinas" var="vacina" paginator="true" paginatorPosition="bottom" rows="10" 
+                                     resizableColumns="true" emptyMessage="Não há vacinas registradas."
+                                     value="#{vacinasController.vacinas}" selection="#{vacinasController.vacinaSelecionada}" 
+                                     selectionMode="single" rowKey="#{vacina.id}" sortBy="#{vacina.nome}">
+
+                            <!--Evento para quando o item for selecionado-->
+                            <p:ajax event="rowSelect" update=":formVacinas:pnlDesc" oncomplete="desc.show();"/>
+
+                            <f:facet name="header">
+                                Todas as Vacinas
+                            </f:facet>
+
+                            <!--Coluna data Vacina-->
+                            <p:column headerText="Data da Vacina" sortBy="#{vacina.dataVacina}" 
+                                      filterBy="#{vacina.dataVacina}" id="dataVacina">
+                                <h:outputText value="#{vacina.dataVacina}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <!--Coluna Nome da Vacina-->
+                            <p:column headerText="Nome Vacina" sortBy="#{vacina.nome}" 
+                                      filterBy="#{vacina.nome}" id="nomeVacina">
+                                #{vacina.nome}
+                            </p:column>
+
+                            <!--Coluna data da adição-->
+                            <p:column headerText="Data Adição" resizable="false" sortBy="#{vacina.dataAdd}" 
+                                      filterBy="#{vacina.dataAdd}" id="dataAddVacina">
+                                <h:outputText value="#{vacina.dataAdd}">
+                                    <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                </h:outputText>
+                            </p:column>                            
+
+                            <p:column headerText="Ações" style="width: 60px" resizable="false">
+                                <p:commandButton icon="ui-icon-pencil" style="width: 25px; height: 25px" 
+                                                 update=":dlgAltVacina" oncomplete="altVacina.show();" title="Alterar">
+                                    <f:setPropertyActionListener value="#{vacina.id}" target="#{vacinasController.vacinaAlteVacina.id}"/>
+                                    <f:setPropertyActionListener value="#{vacina.nome}" target="#{vacinasController.vacinaAlteVacina.nome}"/>
+                                    <f:setPropertyActionListener value="#{vacina.descricao}" target="#{vacinasController.vacinaAlteVacina.descricao}"/>
+                                    <f:setPropertyActionListener value="#{vacina.dataAdd}" target="#{vacinasController.vacinaAlteVacina.dataAdd}"/>
+                                    <f:setPropertyActionListener value="#{vacina.dataVacina}" target="#{vacinasController.vacinaAlteVacina.dataVacina}"/>
+                                    <f:setPropertyActionListener value="#{vacina.usuario}" target="#{vacinasController.vacinaAlteVacina.usuario}"/>
+                                </p:commandButton>
+                                
+                                <p:spacer height="10" width="10"/>
+                                
+                                <p:commandButton icon="ui-icon-trash" style="width: 25px; height: 25px"
+                                                 title="Excluir" onclick="confirmacao.show();">
+                                    <f:setPropertyActionListener value="#{vacina}" target="#{vacinasController.vacinaSelecionadaEA}"/>
+                                </p:commandButton>
+
+                                <!--Confirmação de exclusão-->
+                                <p:confirmDialog id="cdlgExcluirVacina" message="Tem certeza que deseja excluir essa vacina?"
+                                                 header="Excluir Vacina" severity="alert" widgetVar="confirmacao"
+                                                 closable="false">
+                                    <p:commandButton value="Sim" update=":formVacinas:vacinas" onclick="confirmacao.hide();"
+                                                     icon="ui-icon-check" actionListener="#{vacinasController.excluirVacina()}"/>
+                                    
+                                    <p:commandButton value="Não" onclick="confirmacao.hide();" icon="ui-icon-close"/>
+                                </p:confirmDialog>
+                                
+                            </p:column>                            
+
+                            
+                        </p:dataTable>
+                        
+                        <!--Dialog que mostra a descrição-->
+                        <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                  modal="true" resizable="false" widgetVar="desc">
+                            <p:scrollPanel>
+                                <h:panelGrid columns="1" id="pnlDesc">
+                                    <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                     value="#{vacinasController.vacinaSelecionada.descricao}"/>
+                                </h:panelGrid>
+                            </p:scrollPanel>
+                        </p:dialog>
+                        
+                    </h:form>
+                    <!--Botão Adicinar Vacina-->
+                    <h:form id="acoesVacina" title="Acoes">
+                        <p:commandButton value="Adicionar" id="btnAdicionar" onclick="addVacina.show();"/>
+                    </h:form>
+
+                    <!--..................Formulario/Dialog Adicionar Vacina........................-->
+                    <p:dialog id="dlgAddVacina" header="Adicionar Vacina" closable="false" 
+                              modal="true" resizable="false" widgetVar="addVacina" dynamic="true">                             
+
+                        <h:form id="frmAddVacina">
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="Nome*: " for="txtNome"/>
+                                <p:inputText value="#{vacinasController.novaVacina.nome}" id="txtNome" 
+                                             maxlength="25" required="true" 
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Nome da Vacina" requiredMessage="O campo Nome é de preenchimento obrigatorio." >
+                                    <p:watermark for="txtNome" value="Digite o nome da vacina" />                                                       
+                                </p:inputText>
+
+                                <h:outputLabel value="Data da Vacina: " for="txtDataVacina"/>
+                                <p:calendar id="txtDataVacina" size="10" locale="pt" pattern="dd/MM/yyyy"
+                                            title="Data de Nascimento" mindate="01/01/1900" navigator="true" showButtonPanel="true" value="#{vacinasController.novaVacina.dataVacina}">
+                                    <p:watermark for="txtDataVacina" value="dd/mm/aaaa" />       
+                                </p:calendar>
+
+                                <h:outputLabel value="Descrição: " for="txtDescricao"/>
+                                <p:inputTextarea id="txtDescricao" maxlength="255" 
+                                                 rows="6" cols="24" counter="counter" counterTemplate="{0} caracteres restantes."
+                                                 value="#{vacinasController.novaVacina.descricao}">
+                                    <p:watermark for="txtDescricao" value="Descreva informações que considere importante sobre a vacina." />                                   
+                                </p:inputTextarea>
+                                <p:spacer width="10" height="10"/>
+                                <h:outputText id="counter"/>
+
+                                <p:commandButton id="btnAdicionar" value="Adicionar" update=":formVacinas:vacinas,:dlgAddVacina"
+                                                 actionListener="#{vacinasController.adicionarVacina()}" onclick="addVacina.hide();"/>
+                                <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="addVacina.hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+                    
+                    <!--..................Formulario/Dialog Alterar Vacina..........................-->
+                    <p:dialog id="dlgAltVacina" header="Alterar Vacina" closable="false"
+                              modal="true" resizable="false" widgetVar="altVacina" dynamic="true">                             
+
+                        <h:form id="frmAltVacina">
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="Nome: " for="txtNome"/>
+                                <p:inputText value="#{vacinasController.vacinaAlteVacina.nome}" id="txtNome" 
+                                             maxlength="25" required="true" 
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Nome da Vacina" requiredMessage="O campo Nome é de preenchimento obrigatorio." />
+
+                                <h:outputLabel value="Data da Vacina: " for="txtDataVacina"/>
+                                <p:calendar id="txtDataVacina" size="10" locale="pt" pattern="dd/MM/yyyy"
+                                            title="Data de Nascimento" mindate="01/01/1900" navigator="true" showButtonPanel="true" 
+                                            value="#{vacinasController.vacinaAlteVacina.dataVacina}">
+                                    <p:watermark for="txtDataVacina" value="dd/mm/aaaa" />       
+                                </p:calendar>
+
+                                <h:outputLabel value="Descrição: " for="txtDescricao"/>
+                                <p:inputTextarea id="txtDescricao" maxlength="255" 
+                                                 rows="6" cols="24" counter="counter" counterTemplate="{0} caracteres restantes."
+                                                 value="#{vacinasController.vacinaAlteVacina.descricao}"/>
+                                <p:spacer width="10" height="10"/>
+                                <h:outputText id="counter"/>
+
+                                <p:commandButton id="btnAdicionar" value="Alterar"  
+                                                 oncomplete="altVacina.hide();" update=":formVacinas:vacinas" actionListener="#{vacinasController.alterarVacina()}"/>
+                                <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="altVacina.hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+                    
+                </div>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

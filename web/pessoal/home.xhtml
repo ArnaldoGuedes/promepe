@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./templeteAreaPessoal.xhtml">
+
+            <ui:define name="content">
+                <h2>Bem vindo #{homeController.usuarioLogado.nome} </h2>
+                <h2>Seu Código de Emergência é: #{homeController.usuarioLogado.codEmergencia} </h2>
+
+                <h:form>
+                    <h2>
+                        <p:commandLink value="Gerar Cartão de Emergência" ajax="false" actionListener="#{homeController.gerarCartao()}"/> 
+                    </h2>
+
+                    <h3 style="color: red">
+                        <h:outputText rendered="#{homeController.codConsultado}" value="Seu código de emergência foi consultado em '"/>
+                        <h:outputText rendered="#{homeController.codConsultado}" style="font-weight: bolder" value="#{homeController.dataConsulta}">
+                            <f:convertDateTime parent="dd/MM/yyyy hh:mm" type="both" locale="pt,BR" timeZone="Brazil/East"/>
+                        </h:outputText>
+                        <h:outputText rendered="#{homeController.codConsultado}" value="' e aconselhavel " />
+                        <p:commandLink rendered="#{homeController.codConsultado}" value="alterar o código de emergência " actionListener="#{homeController.alterarCodigoEmergencia()}"/>
+                        <h:outputText rendered="#{homeController.codConsultado}" value="e gerar um novo cartão de emergência."/>
+                    </h3>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

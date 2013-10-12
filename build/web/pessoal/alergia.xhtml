@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./templeteAreaPessoal.xhtml">
+            
+            <ui:define name="content">
+                <div align="center">
+
+                    <h:form id="formAlergias" title="Alergias">
+
+                        <!--Todas as Alergias-->
+                        <p:dataTable id="alergias" var="alergia" paginator="true" paginatorPosition="bottom" rows="10" 
+                                     resizableColumns="true" emptyMessage="Não ha alergias registradas."
+                                     value="#{alergiaController.alergias}" selection="#{alergiaController.alergiaSelecionada}" 
+                                     selectionMode="single" rowKey="#{alergia.id}" sortBy="#{alergia.nome}">
+
+                            <!--Evento para quando o item for selecionado-->
+                            <p:ajax event="rowSelect" update=":formAlergias:pnlDesc" oncomplete="desc.show();"/>
+
+                            <f:facet name="header">
+                                Todas as Alergias
+                            </f:facet>
+
+                            <!--Coluna Nome da Alergia-->
+                            <p:column headerText="Nome Alergia" sortBy="#{alergia.nome}" 
+                                      filterBy="#{alergia.nome}" id="nomeAlergia">
+                                #{alergia.nome}
+                            </p:column>
+                           
+                            <!--Coluna ultima reação alergica-->
+                            <p:column headerText="Ultima Reação Alérgica" sortBy="#{alergia.ultimaReacao}" 
+                                      filterBy="#{alergia.ultimaReacao}" id="ultimaReacao">
+                                <h:outputText value="#{alergia.ultimaReacao}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                </h:outputText>
+                            </p:column>
+                            
+                            <!--Coluna data da adição-->
+                            <p:column headerText="Data Adição" resizable="false" sortBy="#{alergia.dataAdd}" 
+                                      filterBy="#{alergia.dataAdd}" id="dataAddAlergia">
+                                <h:outputText value="#{alergia.dataAdd}">
+                                    <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                </h:outputText>
+                            </p:column>                            
+                                                        
+                            <p:column headerText="Ações" style="width: 60px" resizable="false">
+                                <p:commandButton icon="ui-icon-pencil" style="width: 25px; height: 25px" 
+                                                 update=":dlgAltAlergia" oncomplete="altAlergia.show();" title="Alterar">
+                                    <f:setPropertyActionListener value="#{alergia.id}" target="#{alergiaController.alergiaAlterar.id}"/>
+                                    <f:setPropertyActionListener value="#{alergia.ultimaReacao}" target="#{alergiaController.alergiaAlterar.ultimaReacao}"/>
+                                    <f:setPropertyActionListener value="#{alergia.usuario}" target="#{alergiaController.alergiaAlterar.usuario}"/>
+                                    <f:setPropertyActionListener value="#{alergia.descricao}" target="#{alergiaController.alergiaAlterar.descricao}"/>
+                                    <f:setPropertyActionListener value="#{alergia.nome}" target="#{alergiaController.alergiaAlterar.nome}"/>
+                                    <f:setPropertyActionListener value="#{alergia.dataAdd}" target="#{alergiaController.alergiaAlterar.dataAdd}"/>
+                                </p:commandButton>
+
+                                <p:spacer height="10" width="10"/>
+
+                                <p:commandButton icon="ui-icon-trash" style="width: 25px; height: 25px"
+                                                 title="Excluir" onclick="confirmacao.show();">
+                                    <f:setPropertyActionListener value="#{alergia}" target="#{alergiaController.alergiaSelecionadaEA}"/>
+                                </p:commandButton>
+
+                                <!--Confirmação de exclusão-->
+                                <p:confirmDialog id="cdlgExcluirAlergia" message="Tem certeza que deseja excluir essa alergia?"
+                                                 header="Excluir Alergia" severity="alert" widgetVar="confirmacao"
+                                                 closable="false">
+                                    <p:commandButton value="Sim" update=":formAlergias:alergias" onclick="confirmacao.hide();"
+                                                     icon="ui-icon-check" actionListener="#{alergiaController.excluirAlergia()}" />
+
+                                    <p:commandButton value="Não" onclick="confirmacao.hide();" icon="ui-icon-close"/>
+                                </p:confirmDialog>
+
+                            </p:column>                            
+
+
+                        </p:dataTable>
+
+                        <!--Dialog que mostra a descrição-->
+                        <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                  modal="true" resizable="false" widgetVar="desc">
+                            <p:scrollPanel>
+                                <h:panelGrid columns="1" id="pnlDesc">
+                                    <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                     value="#{alergiaController.alergiaSelecionada.descricao}"/>
+                                </h:panelGrid>
+                            </p:scrollPanel>
+                        </p:dialog>
+
+                    </h:form>
+                    <!--Botão Adicinar Alergia-->
+                    <h:form id="acoesAlergia" title="Acoes">
+                        <p:commandButton value="Adicionar" id="btnAdicionar" onclick="addAlergia.show();"/>
+                    </h:form>
+
+                    <!--..................Formulario/Dialog Adicionar Alergia........................-->
+                    <p:dialog id="dlgAddAlergia" header="Adicionar Alergia" closable="false" 
+                              modal="true" resizable="false" widgetVar="addAlergia" dynamic="true">                             
+
+                        <h:form id="frmAddAlergia">
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="Nome*: " for="txtNome"/>
+                                <p:inputText value="#{alergiaController.novaAlergia.nome}" id="txtNome" 
+                                             maxlength="25" required="true" label="nome"
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Nome da Alergia" requiredMessage="O campo Nome é de preenchimento obrigatorio." >
+                                <p:watermark for="txtNome" value="Digite o nome da alergia" />
+                                </p:inputText>
+                                
+                                <h:outputLabel value="Ultima Reação Alérgica: " for="txtUltimaReacao"/>
+                                <p:calendar id="txtUltimaReacao" size="10" locale="pt" pattern="dd/MM/yyyy"
+                                            title="Ultima Reação Alergica" mindate="01/01/1900" showButtonPanel="true" value="#{alergiaController.novaAlergia.ultimaReacao}">
+                                    <p:watermark for="txtUltimaReacao" value="dd/mm/aaaa" />       
+                                </p:calendar>
+                                
+                                <h:outputLabel value="Descrição: " for="txtDescricao"/>
+                                <p:inputTextarea id="txtDescricao" maxlength="255" 
+                                                 rows="6" cols="24" counter="counter" counterTemplate="{0} caracteres restantes."
+                                                 value="#{alergiaController.novaAlergia.descricao}">
+                                <p:watermark for="txtDescricao" value="Descreva informações que considere importante sobre a alergia." />
+                                </p:inputTextarea>
+                                <p:spacer width="10" height="10"/>
+                                <h:outputText id="counter"/>
+                                
+                                <p:commandButton id="btnAdicionar" value="Adicionar" update=":formAlergias:alergias,:dlgAddAlergia"
+                                                 actionListener="#{alergiaController.adicionarAlergia()}" onsuccess="addAlergia.hide();"/>
+                                <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="addAlergia.hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <!--..................Formulario/Dialog Alterar Alergia..........................-->
+                    <p:dialog id="dlgAltAlergia" header="Alterar Alergia" closable="false" 
+                              modal="true" resizable="false" widgetVar="altAlergia" dynamic="true">                             
+
+                        <h:form id="frmAltAlergia">
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="Nome: " for="txtNome"/>
+                                <p:inputText value="#{alergiaController.alergiaAlterar.nome}" id="txtNome" label="nome"
+                                             maxlength="25" required="true" 
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Nome da Alergia" requiredMessage="O campo Nome é de preenchimento obrigatorio." />
+
+                                <h:outputLabel value="Ultima Reação Alérgica: " for="txtUltimaReacao"/>
+                                <p:calendar id="txtUltimaReacao" size="10" locale="pt" pattern="dd/MM/yyyy"
+                                            title="Ultima Reação Alérgica" mindate="01/01/1900" navigator="true" showButtonPanel="true" 
+                                            value="#{alergiaController.alergiaAlterar.ultimaReacao}">
+                                    <p:watermark for="txtUltimaReacao" value="dd/mm/aaaa" />       
+                                </p:calendar>
+
+                                <h:outputLabel value="Descrição: " for="txtDescricao"/>
+                                <p:inputTextarea id="txtDescricao" maxlength="255" 
+                                                 rows="6" cols="24" counter="counter" counterTemplate="{0} caracteres restantes."
+                                                 value="#{alergiaController.alergiaAlterar.descricao}"/>
+                                <p:spacer width="10" height="10"/>
+                                <h:outputText id="counter"/>
+                                                                
+                                <p:commandButton id="btnAlterar" value="Alterar"  
+                                                 oncomplete="altAlergia.hide();" update=":formAlergias:alergias" actionListener="#{alergiaController.alterarAlergia()}"/>
+                                <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="altAlergia.hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                </div>
+            </ui:define>
+            
+        </ui:composition>
+
+    </body>
+</html>

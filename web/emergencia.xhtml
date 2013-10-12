@@ -1,0 +1,398 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./templateInicio.xhtml">
+
+            <ui:define name="content">
+                <p:tabView id="tbEmergencia" onTabChange="#{emergenciaController.atualizarTabelas()}">
+                    <!--Informações Basicas-->
+                    <p:tab title="Informações Pessoais">
+                        <center>
+
+                            <h:form>
+                                <p:commandButton icon="ui-icon-disk" ajax="false" title="Gerar PDF" actionListener="#{emergenciaController.relatorioInfoPessoais()}"/>
+                                <p:commandButton icon="ui-icon-disk" ajax="false" title="Gerar PDF" value="PDF de todos os relatorios" 
+                                                 actionListener="#{emergenciaController.relatorioGeral()}"/>
+                            </h:form>
+
+
+                            <p:panelGrid id="pnlInformacoesPessoal" columns="2" style="text-align: center"> 
+                                <h:outputLabel for="txtNomeUsuario" value="Nome de Usuário: " style="font-weight: bolder"/>
+                                <h:outputText id="txtNomeUsuario" value="#{emergenciaController.usuario.nome}"/>
+
+                                <h:outputLabel for="txtNomeCompleto" value="Nome Completo: " style="font-weight: bolder"/>
+                                <h:outputText id="txtNomeCompleto" value="#{emergenciaController.usuario.nomeCompleto}" />
+
+                                <h:outputLabel for="txtNomeMae" value="Nome da Mãe" style="font-weight: bolder"/>
+                                <h:outputText id="txtNomeMae" value="#{emergenciaController.usuario.nomeMae}" />
+
+                                <h:outputLabel for="txtTelefoneResidencial" value="Telefone Residencial: " style="font-weight: bolder"/>
+                                <h:outputText id="txtTelefoneResidencial" value="#{emergenciaController.usuario.telefoneCasa}" />
+
+                                <h:outputLabel for="txtTipoSanguineo" value="Tipo Sanguíneo/Fator Rh¹: " style="font-weight: bolder"/>
+                                <h:outputText id="txtTipoSanguineo" value="#{emergenciaController.usuario.tipoSanguineo}" />                         
+
+                                <h:outputLabel for="txtDataNascimento" value="Data de Nascimento: " style="font-weight: bolder"/>
+                                <h:outputText id="txtDataNascimento" value="#{emergenciaController.usuario.dataNascimento}">
+                                    <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                </h:outputText>                            
+
+                                <h:outputLabel for="txtInformacoes" value="Informações Importantes: " style="font-weight: bolder"/>
+                                <h:form>  <!--Gambiarra XD-->
+                                    <p:inputTextarea id="txtInformacoes" value="#{emergenciaController.usuario.informacoesImportantes}"
+                                                     cols="24" rows="6" readonly="true" />
+                                </h:form>
+
+                                <f:facet name="footer">                                
+                                    <h:outputText style="font-weight: bolder" value="Informações de responsabilidade do usuário."/>
+                                    <br/>
+                                    <h:outputText value="1 - NS: Não Sabe."/>
+                                </f:facet>
+
+                            </p:panelGrid>
+                        </center>
+                    </p:tab>
+
+                    <!--Contatos Emergenciais-->
+                    <p:tab title="Contatos Emergenciais">
+                        <h:form id="formContatoEmergencias">
+                            <p:commandButton icon="ui-icon-disk" ajax="false" title="Gerar PDF" actionListener="#{emergenciaController.relatorioContatoEmergencia()}"/>
+                            <b>* Para ter acesso a descrição clique sobre a linha.</b>
+
+                            <!--Todas os Contatos-->
+                            <p:dataTable id="contatoEmergencias" var="contatoEmergencia" paginator="true" paginatorPosition="bottom" rows="10" 
+                                         resizableColumns="true" emptyMessage="Não há contato emergencial registrado."
+                                         value="#{emergenciaController.contatoEmergencias}" selection="#{emergenciaController.contatoEmergencia}" 
+                                         selectionMode="single" rowKey="#{contatoEmergencia.id}" sortBy="#{contatoEmergencia.nome}">
+
+                                <!--Evento para quando o item for selecionado-->
+                                <p:ajax event="rowSelect" update=":tbEmergencia:formContatoEmergencias:pnlDesc" oncomplete="desc3.show();"/>                                
+
+                                <!--Coluna Nome do Contato Emergencia-->
+                                <p:column headerText="Nome do Contato" sortBy="#{contatoEmergencia.nome}" 
+                                          filterBy="#{contatoEmergencia.nome}" id="nomeContatoEmergencia">
+                                    #{contatoEmergencia.nome}
+                                </p:column>
+
+                                <!--Parentesco do Contato Emergencia-->
+                                <p:column headerText="Parentesco" sortBy="#{contatoEmergencia.parentesco}" 
+                                          filterBy="#{contatoEmergencia.parentesco}" id="parentescoContatoEmergencia">
+                                    #{contatoEmergencia.parentesco}
+                                </p:column>
+
+                                <!--Tefone1 do Contato Emergencia-->
+                                <p:column headerText="Telefone 1" filterBy="#{contatoEmergencia.telefone1}" 
+                                          id="telefone1ContatoEmergencia">
+                                    #{contatoEmergencia.telefone1}
+                                </p:column>
+
+                                <!--Tefone2 do Contato Emergencia-->
+                                <p:column headerText="Telefone 2" filterBy="#{contatoEmergencia.telefone2}" 
+                                          id="telefone2ContatoEmergencia">
+                                    #{contatoEmergencia.telefone2}
+                                </p:column>
+
+                                <!--E-mail do Contato Emergencia-->
+                                <p:column headerText="E-Mail" resizable="false" filterBy="#{contatoEmergencia.email}" 
+                                          id="emailContatoEmergencia">
+                                    #{contatoEmergencia.email}
+                                </p:column>                           
+
+
+                            </p:dataTable>
+
+                            <!--Dialog que mostra a descrição-->
+                            <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                      modal="true" resizable="false" widgetVar="desc3">
+                                <p:scrollPanel>
+                                    <h:panelGrid columns="1" id="pnlDesc">
+                                        <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                         value="#{emergenciaController.contatoEmergencia.descricao}"/>
+                                    </h:panelGrid>
+                                </p:scrollPanel>
+                            </p:dialog>
+
+                        </h:form>
+
+                    </p:tab>
+
+                    <!--Alergias-->
+                    <p:tab title="Alergias">
+
+                        <h:form id="formAlergias">
+                            <p:commandButton icon="ui-icon-disk" ajax="false" title="Gerar PDF" actionListener="#{emergenciaController.relatorioAlergia()}"/>
+                            <b>* Para ter acesso a descrição clique sobre a linha.</b>
+
+                            <p:dataTable id="alergias" var="alergia" paginator="true" paginatorPosition="bottom" rows="10" 
+                                         resizableColumns="true" emptyMessage="Não ha alergias registradas."
+                                         value="#{emergenciaController.alergias}" selection="#{emergenciaController.alergiaSeleciona}" 
+                                         selectionMode="single" rowKey="#{alergia.id}" sortBy="#{alergia.nome}">
+
+                                <!--Evento para quando o item for selecionado-->
+                                <p:ajax event="rowSelect" update=":tbEmergencia:formAlergias:pnlDesc" oncomplete="desc.show();"/>
+
+                                <!--Coluna Nome da Alergia-->
+                                <p:column headerText="Nome Alergia" sortBy="#{alergia.nome}" 
+                                          filterBy="#{alergia.nome}" id="nomeAlergia">
+                                    #{alergia.nome}
+                                </p:column>
+
+                                <!--Coluna ultima reação alergica-->
+                                <p:column headerText="Ultima Reação Alérgica" sortBy="#{alergia.ultimaReacao}" 
+                                          filterBy="#{alergia.ultimaReacao}" id="ultimaReacao">
+                                    <h:outputText value="#{alergia.ultimaReacao}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <!--Coluna data da adição-->
+                                <p:column headerText="Data Adição" resizable="false" sortBy="#{alergia.dataAdd}" 
+                                          filterBy="#{alergia.dataAdd}" id="dataAddAlergia">
+                                    <h:outputText value="#{alergia.dataAdd}">
+                                        <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                    </h:outputText>
+                                </p:column>                            
+
+                            </p:dataTable>
+
+                            <!--Dialog que mostra a descrição-->
+                            <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                      modal="true" resizable="false" widgetVar="desc">
+                                <p:scrollPanel>
+                                    <h:panelGrid columns="1" id="pnlDesc">
+                                        <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                         value="#{emergenciaController.alergiaSeleciona.descricao}"/>
+                                    </h:panelGrid>
+                                </p:scrollPanel>
+                            </p:dialog>
+                        </h:form>
+                    </p:tab>
+
+                    <!--Doencas Cronica-->
+                    <p:tab title="Doenças Crônica">
+                        <h:form id="formDoencaCronicas">
+                            <p:commandButton icon="ui-icon-disk" ajax="false" title="Gerar PDF" actionListener="#{emergenciaController.relatorioDoencasCronicas()}"/>
+                            <b>* Para ter acesso a descrição clique sobre a linha.</b>
+
+                            <!--Todas as Doencas Cronica-->
+                            <p:dataTable id="doencaCronicas" var="doencaCronica" paginator="true" paginatorPosition="bottom" rows="10" 
+                                         resizableColumns="true" emptyMessage="Não ha doença Crônica registradas."
+                                         value="#{emergenciaController.doencaCronicas}" selection="#{emergenciaController.dc}" 
+                                         selectionMode="single" rowKey="#{doencaCronica.id}" sortBy="#{doencaCronica.nome}">
+
+                                <!--Evento para quando o item for selecionado-->
+                                <p:ajax event="rowSelect" update=":tbEmergencia:formDoencaCronicas:pnlDesc" oncomplete="desc2.show();"/>
+
+                                <!--Coluna Nome da Doenca Cronica-->
+                                <p:column headerText="Nome Doença Crônica" sortBy="#{doencaCronica.nome}" 
+                                          filterBy="#{doencaCronica.nome}" id="nomeDoencaCronica">
+                                    #{doencaCronica.nome}
+                                </p:column>
+
+                                <!--Coluna data da adição-->
+                                <p:column headerText="Data Adição" resizable="false" sortBy="#{doencaCronica.dataAdd}" 
+                                          filterBy="#{doencaCronica.dataAdd}" id="dataAddDoencaCronica">
+                                    <h:outputText value="#{doencaCronica.dataAdd}">
+                                        <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                    </h:outputText>
+                                </p:column>                            
+
+                            </p:dataTable>
+
+                            <!--Dialog que mostra a descrição-->
+                            <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                      modal="true" resizable="false" widgetVar="desc2">
+                                <p:scrollPanel>
+                                    <h:panelGrid columns="1" id="pnlDesc">
+                                        <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                         value="#{emergenciaController.dc.descricao}"/>
+                                    </h:panelGrid>
+                                </p:scrollPanel>
+                            </p:dialog>
+
+                        </h:form>
+
+                    </p:tab>
+
+                    <!--Medicamentos Controlados-->
+                    <p:tab title="Medicamentos Controlados">
+                        <h:form id="formMedicamentoControlados" title="MedicamentoControlados">
+                            <p:commandButton icon="ui-icon-disk" ajax="false" title="Gerar PDF" actionListener="#{emergenciaController.relatorioMedicamentoControlado()}"/>
+                            <b>* Para ter acesso a descrição clique sobre a linha.</b>
+
+                            <!--Todos os MedicamentoControlados-->
+                            <p:dataTable id="medicamentoControlados" var="medicamentoControlado" paginator="true" paginatorPosition="bottom" rows="10" 
+                                         resizableColumns="true" emptyMessage="Não há medicamentos controlado registrados."
+                                         value="#{emergenciaController.medicamentoControlados}" selection="#{emergenciaController.medicamentoControlado}" 
+                                         selectionMode="single" rowKey="#{medicamentoControlado.id}" sortBy="#{medicamentoControlado.nome}">
+
+                                <!--Evento para quando o item for selecionado-->
+                                <p:ajax event="rowSelect" update=":tbEmergencia:formMedicamentoControlados:dlgDescMed" oncomplete="descMed.show();"/>
+
+                                <!--Coluna Nome do Medicamento Controlado-->
+                                <p:column headerText="Nome Medicamento" sortBy="#{medicamentoControlado.nome}" 
+                                          filterBy="#{medicamentoControlado.nome}" id="nomeMedicamentoControlado">
+                                    #{medicamentoControlado.nome}
+                                </p:column>
+
+                                <!--Coluna Nome do Laborátorio-->
+                                <p:column headerText="Nome Laboratório" sortBy="#{medicamentoControlado.laboratorio}" 
+                                          filterBy="#{medicamentoControlado.laboratorio}" id="nomeLaboratorio">
+                                    #{medicamentoControlado.laboratorio}
+                                </p:column>
+
+                                <!--Coluna Data de Inicio-->
+                                <p:column headerText="Data de Início" sortBy="#{medicamentoControlado.dataInicio}" 
+                                          filterBy="#{medicamentoControlado.dataInicio}" id="dataInicio">
+                                    <h:outputText value="#{medicamentoControlado.dataInicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/Eost"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <!--Coluna data da adição-->
+                                <p:column headerText="Data Adição" resizable="false" sortBy="#{medicamentoControlado.dataAdd}" 
+                                          filterBy="#{medicamentoControlado.dataAdd}" id="dataAddMedicamentoControlado">
+                                    <h:outputText value="#{medicamentoControlado.dataAdd}">
+                                        <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/Eost"/>
+                                    </h:outputText>
+                                </p:column>                            
+
+                            </p:dataTable>
+
+                            <!--Dialog que mostra a descrição-->
+                            <p:dialog id="dlgDescMed" header="Descrição" closable="true" draggable="false"
+                                      modal="true" resizable="false" widgetVar="descMed">
+                                <p:scrollPanel>
+                                    <h:panelGrid columns="1" id="pnlDescMed">
+                                        <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                         value="#{emergenciaController.medicamentoControlado.descricao}"/>
+                                    </h:panelGrid>
+                                </p:scrollPanel>
+                            </p:dialog>
+
+                        </h:form>
+                    </p:tab>
+
+                    <!--Vacinas-->
+                    <p:tab title="Vacinas">
+
+                        <h:form id="formVacinas" title="Vacinas">
+
+                            <p:commandButton icon="ui-icon-disk" ajax="false" title="Gerar PDF" actionListener="#{emergenciaController.relatorioVacinas()}"/>                            
+                            <b>* Para ter acesso a descrição clique sobre a linha.</b>
+                            
+                            <!--Todas as Vacinas-->
+                            <p:dataTable id="vacinas" var="vacina" paginator="true" paginatorPosition="bottom" rows="10" 
+                                         resizableColumns="true" emptyMessage="Não há vacinas registradas."
+                                         value="#{emergenciaController.vacinas}" selection="#{emergenciaController.vacina}" 
+                                         selectionMode="single" rowKey="#{vacina.id}" sortBy="#{vacina.nome}">
+
+                                <!--Evento para quando o item for selecionado-->
+                                <p:ajax event="rowSelect" update=":tbEmergencia:formVacinas:pnlDesc" oncomplete="descVacina.show();"/>
+
+                                <!--Coluna data Vacina-->
+                                <p:column headerText="Data da Vacina" sortBy="#{vacina.dataVacina}" 
+                                          filterBy="#{vacina.dataVacina}" id="dataVacina">
+                                    <h:outputText value="#{vacina.dataVacina}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <!--Coluna Nome da Vacina-->
+                                <p:column headerText="Nome Vacina" sortBy="#{vacina.nome}" 
+                                          filterBy="#{vacina.nome}" id="nomeVacina">
+                                    #{vacina.nome}
+                                </p:column>
+
+                                <!--Coluna data da adição-->
+                                <p:column headerText="Data Adição" resizable="false" sortBy="#{vacina.dataAdd}" 
+                                          filterBy="#{vacina.dataAdd}" id="dataAddVacina">
+                                    <h:outputText value="#{vacina.dataAdd}">
+                                        <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                    </h:outputText>
+                                </p:column>                            
+
+                            </p:dataTable>
+
+                            <!--Dialog que mostra a descrição-->
+                            <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                      modal="true" resizable="false" widgetVar="descVacina">
+                                <p:scrollPanel>
+                                    <h:panelGrid columns="1" id="pnlDesc">
+                                        <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                         value="#{emergenciaController.vacina.descricao}"/>
+                                    </h:panelGrid>
+                                </p:scrollPanel>
+                            </p:dialog>
+
+                        </h:form>
+
+                    </p:tab>
+                    
+                    <!--Cirurgias-->
+                    <p:tab title="Cirurgias">
+
+                        <h:form id="formCirurgias">
+                            <p:commandButton icon="ui-icon-disk" ajax="false" title="Gerar PDF" actionListener="#{emergenciaController.relatorioCirurgias()}"/>
+                            <b>* Para ter acesso a descrição clique sobre a linha.</b>
+
+                            <p:dataTable id="cirurgias" var="cirurgia" paginator="true" paginatorPosition="bottom" rows="10" 
+                                         resizableColumns="true" emptyMessage="Não há cirurgias registradas."
+                                         value="#{emergenciaController.cirurgias}" selection="#{emergenciaController.cirurgia}" 
+                                         selectionMode="single" rowKey="#{cirurgia.id}" sortBy="#{cirurgia.dataOperacao}">
+
+                                <!--Evento para quando o item for selecionado-->
+                                <p:ajax event="rowSelect" update=":tbEmergencia:formCirurgias:pnlDescCirurgia" oncomplete="descCirurgia.show();"/>
+
+                                <!--Coluna Nome da Alergia-->
+                                <p:column headerText="Local Operado" sortBy="#{cirurgia.localOperado}" 
+                                          filterBy="#{cirurgia.localOperado}" id="nomeAlergia">
+                                    #{cirurgia.localOperado}
+                                </p:column>
+
+                                <!--Coluna ultima data da Cirurgia-->
+                                <p:column headerText="Data da Cirurgia" sortBy="#{cirurgia.dataOperacao}" 
+                                          filterBy="#{cirurgia.dataOperacao}" id="ultimaReacao">
+                                    <h:outputText value="#{cirurgia.dataOperacao}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <!--Coluna data da adição-->
+                                <p:column headerText="Data Adição" resizable="false" sortBy="#{cirurgia.dataAdd}" 
+                                          filterBy="#{cirurgia.dataAdd}" id="dataAddAlergia">
+                                    <h:outputText value="#{cirurgia.dataAdd}">
+                                        <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                    </h:outputText>
+                                </p:column>                            
+
+                            </p:dataTable>
+
+                            <!--Dialog que mostra a descrição-->
+                            <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                      modal="true" resizable="false" widgetVar="descCirurgia">
+                                <p:scrollPanel>
+                                    <h:panelGrid columns="1" id="pnlDescCirurgia">
+                                        <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                         value="#{emergenciaController.cirurgia.descricao}"/>
+                                    </h:panelGrid>
+                                </p:scrollPanel>
+                            </p:dialog>
+                        </h:form>
+                    </p:tab>
+
+
+                </p:tabView>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

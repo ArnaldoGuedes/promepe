@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./templeteAreaPessoal.xhtml">
+
+            <ui:define name="content">
+                <div align="center">
+
+                    <h:form id="formContatoEmergencias" title="Contatos Emergência">
+
+                        <!--Todos os ContatoEmergencias-->
+                        <p:dataTable id="contatoEmergencias" var="contatoEmergencia" paginator="true" paginatorPosition="bottom" rows="10" 
+                                     resizableColumns="true" emptyMessage="Não há contatos de emergência registrados."
+                                     value="#{contatoEmergenciaController.contatoEmergencias}" selection="#{contatoEmergenciaController.contatoEmergenciaSelecionado}" 
+                                     selectionMode="single" rowKey="#{contatoEmergencia.id}" sortBy="#{contatoEmergencia.nome}">
+
+                            <!--Evento para quando o item for selecionado-->
+                            <p:ajax event="rowSelect" update=":formContatoEmergencias:pnlDesc" oncomplete="desc.show();"/>
+
+                            <f:facet name="header">
+                                Todos os Contatos de Emergência
+                            </f:facet>
+
+                            <!--Coluna Nome do Contato Emergencia-->
+                            <p:column headerText="Nome do Contato" sortBy="#{contatoEmergencia.nome}" 
+                                      filterBy="#{contatoEmergencia.nome}" id="nomeContatoEmergencia">
+                                #{contatoEmergencia.nome}
+                            </p:column>
+
+                            <!--Parentesco do Contato Emergencia-->
+                            <p:column headerText="Parentesco" sortBy="#{contatoEmergencia.parentesco}" 
+                                      filterBy="#{contatoEmergencia.parentesco}" id="parentescoContatoEmergencia">
+                                #{contatoEmergencia.parentesco}
+                            </p:column>
+
+                            <!--Tefone1 do Contato Emergencia-->
+                            <p:column headerText="Telefone 1" filterBy="#{contatoEmergencia.telefone1}" 
+                                      id="telefone1ContatoEmergencia">
+                                #{contatoEmergencia.telefone1}
+                            </p:column>
+
+                            <!--Tefone2 do Contato Emergencia-->
+                            <p:column headerText="Telefone 2" filterBy="#{contatoEmergencia.telefone2}" 
+                                      id="telefone2ContatoEmergencia">
+                                #{contatoEmergencia.telefone2}
+                            </p:column>
+
+                            <!--E-mail do Contato Emergencia-->
+                            <p:column headerText="E-Mail" resizable="false" filterBy="#{contatoEmergencia.email}" 
+                                      id="emailContatoEmergencia">
+                                #{contatoEmergencia.email}
+                            </p:column>                           
+
+                            <p:column headerText="Ações" style="width: 60px" resizable="false">
+                                <p:commandButton icon="ui-icon-pencil" style="width: 25px; height: 25px" 
+                                                 update=":dlgAltContatoEmergencia" oncomplete="altContatoEmergencia.show();" title="Alterar">
+                                    <f:setPropertyActionListener value="#{contatoEmergencia.id}" target="#{contatoEmergenciaController.contatoEmergenciaAlterar.id}"/>
+                                    <f:setPropertyActionListener value="#{contatoEmergencia.email}" target="#{contatoEmergenciaController.contatoEmergenciaAlterar.email}"/>
+                                    <f:setPropertyActionListener value="#{contatoEmergencia.usuario}" target="#{contatoEmergenciaController.contatoEmergenciaAlterar.usuario}"/>
+                                    <f:setPropertyActionListener value="#{contatoEmergencia.nome}" target="#{contatoEmergenciaController.contatoEmergenciaAlterar.nome}"/>
+                                    <f:setPropertyActionListener value="#{contatoEmergencia.parentesco}" target="#{contatoEmergenciaController.contatoEmergenciaAlterar.parentesco}"/>
+                                    <f:setPropertyActionListener value="#{contatoEmergencia.telefone1}" target="#{contatoEmergenciaController.contatoEmergenciaAlterar.telefone1}"/>
+                                    <f:setPropertyActionListener value="#{contatoEmergencia.telefone2}" target="#{contatoEmergenciaController.contatoEmergenciaAlterar.telefone2}"/>
+                                </p:commandButton>
+
+                                <p:spacer height="10" width="10"/>
+
+                                <p:commandButton icon="ui-icon-trash" style="width: 25px; height: 25px"
+                                                 title="Excluir" onclick="confirmacao.show();">
+                                    <f:setPropertyActionListener value="#{contatoEmergencia}" target="#{contatoEmergenciaController.contatoEmergenciaSelecionadoEA}"/>
+                                </p:commandButton>
+
+                                <!--Confirmação de exclusão-->
+                                <p:confirmDialog id="cdlgExcluirContatoEmergencia" message="Tem certeza que deseja excluir esse contato?"
+                                                 header="Excluir Contato de emergência" severity="alert" widgetVar="confirmacao"
+                                                 closable="false">
+                                    <p:commandButton value="Sim" update=":formContatoEmergencias:contatoEmergencias" onclick="confirmacao.hide();"
+                                                     icon="ui-icon-check" actionListener="#{contatoEmergenciaController.excluirContatoEmergencia()}" />
+
+                                    <p:commandButton value="Não" onclick="confirmacao.hide();" icon="ui-icon-close"/>
+                                </p:confirmDialog>
+
+                            </p:column>                            
+
+
+                        </p:dataTable>
+
+                        <!--Dialog que mostra a descrição-->
+                        <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                  modal="true" resizable="false" widgetVar="desc">
+                            <p:scrollPanel>
+                                <h:panelGrid columns="1" id="pnlDesc">
+                                    <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                     value="#{contatoEmergenciaController.contatoEmergenciaSelecionado.descricao}"/>
+                                </h:panelGrid>
+                            </p:scrollPanel>
+                        </p:dialog>
+
+                    </h:form>
+                    <!--Botão Adicinar Contato Emergencia-->
+                    <h:form id="acoesContatoEmergencia" title="Acoes">
+                        <p:commandButton value="Adicionar" id="btnAdicionar" onclick="addContatoEmergencia.show();"/>
+                    </h:form>
+
+                    <!--..................Formulario/Dialog Adicionar ContatoEmergencia........................-->
+                    <p:dialog id="dlgAddContatoEmergencia" header="Adicionar Contato de Emergência" closable="false" 
+                              modal="true" resizable="false" widgetVar="addContatoEmergencia" dynamic="true">                             
+
+                        <h:form id="frmAddContatoEmergencia">
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="Nome*: " for="txtNome"/>
+                                <p:inputText value="#{contatoEmergenciaController.novaContatoEmergencia.nome}" id="txtNome" 
+                                             maxlength="75" required="true" label="nome"
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Nome do Contato Emergência" requiredMessage="O campo Nome é de preenchimento obrigatorio." 
+                                             validatorMessage="O nome não pode conter numeros ou caracteres especiais!">
+                                    <f:validateRegex  pattern="^([A-Z,a-z, ,ã,á,à,â,ê,í,ú,õ,é,ü]){0,50}$" for="txtnome"/>
+                                    <p:watermark for="txtNome" value="Digite o nome do contato" />                               
+                                </p:inputText>
+
+                                <h:outputLabel value="Parentesco*: " for="txtParentesco"/>
+                                <p:inputText value="#{contatoEmergenciaController.novaContatoEmergencia.parentesco}" id="txtParentesco" 
+                                             maxlength="20" required="true" label="nome"
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Parentesco" requiredMessage="O campo 'Parentesco' é de preenchimento obrigatorio." 
+                                             validatorMessage="O campo parentesco não pode conter numeros ou caracteres especiais!">
+                                    <f:validateRegex  pattern="^([A-Z,a-z, ,ã,á,à,â,ê,í,ú,õ,é,ü]){0,50}$" for="txtParentesco"/>
+                                    <p:watermark for="txtParentesco" value="Tio, Mãe, etc" />                               
+                                </p:inputText>
+
+                                <h:outputLabel value="Telefone 1*: " for="txtTelefone1"/>
+                                <p:inputMask id="txtTelefone1" mask="(99)9999-9999?9" label="Telefone 1" size="14" 
+                                             value="#{contatoEmergenciaController.novaContatoEmergencia.telefone1}"
+                                             required="true" requiredMessage="É obrigatório informar ao menos um telefone.">
+                                    <p:watermark for="txtTelefone1" value="(00)0000-0000" />                                   
+                                </p:inputMask>
+
+                                <h:outputLabel value="Telefone 2: " for="txtTelefone2"/>
+                                <p:inputMask id="txtTelefone2" mask="(99)9999-9999?9" label="Telefone 2" size="14" 
+                                             value="#{contatoEmergenciaController.novaContatoEmergencia.telefone2}">
+                                    <p:watermark for="txtTelefone2" value="(00)0000-0000" />                                   
+                                </p:inputMask>
+
+                                <h:outputLabel for="txtemail" value="E-Mail: "/>
+                                <p:inputText id="txtemail" label="E-Mail" size="25" value="#{contatoEmergenciaController.novaContatoEmergencia.email}"
+                                             title="E-Mail" validator="#{cadastroUsuarioController.validarEspacoBranco}"
+                                             validatorMessage="E-Mail invalido!"
+                                             onkeyup="this.value = this.value.toLowerCase();
+                                                         this.value = this.value.trim();"> 
+                                    <f:validateLength minimum="5"/>
+                                    <p:watermark for="txtemail" value="exemplo@exemplo.com" />                                       
+                                </p:inputText>
+
+                                <h:outputLabel value="Descrição: " for="txtDescricao"/>
+                                <p:inputTextarea id="txtDescricao" maxlength="255" 
+                                                 rows="6" cols="24" counter="counter" counterTemplate="{0} caracteres restantes."
+                                                 value="#{contatoEmergenciaController.novaContatoEmergencia.descricao}">
+                                    <p:watermark for="txtDescricao" value="Descreva informações que considere importante sobre a contato." />
+                                </p:inputTextarea>
+                                <p:spacer width="10" height="10"/>
+                                <h:outputText id="counter"/>
+
+                                <p:commandButton id="btnAdicionar" value="Adicionar" update=":formContatoEmergencias:contatoEmergencias,:dlgAddContatoEmergencia"
+                                                 actionListener="#{contatoEmergenciaController.adicionarContatoEmergencia()}" onsuccess="addContatoEmergencia.hide();"/>
+                                <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="addContatoEmergencia.hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <!--..................Formulario/Dialog Alterar ContatoEmergencia..........................-->
+                    <p:dialog id="dlgAltContatoEmergencia" header="Alterar ContatoEmergencia" closable="false" 
+                              modal="true" resizable="false" widgetVar="altContatoEmergencia" dynamic="true">                             
+
+                        <h:form id="frmAltContatoEmergencia">
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="Nome*: " for="txtNome"/>
+                                <p:inputText value="#{contatoEmergenciaController.contatoEmergenciaAlterar.nome}" id="txtNome" 
+                                             maxlength="75" required="true" label="nome"
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Nome do Contato Emergência" requiredMessage="O campo Nome é de preenchimento obrigatorio." 
+                                             validatorMessage="O nome não pode conter numeros ou caracteres especiais!">
+                                    <f:validateRegex  pattern="^([A-Z,a-z, ,ã,á,à,â,ê,í,ú,õ,é,ü]){0,50}$" for="txtnome"/>
+                                    <p:watermark for="txtNome" value="Digite o nome do contato" />                               
+                                </p:inputText>
+
+                                <h:outputLabel value="Parentesco*: " for="txtParentesco"/>
+                                <p:inputText value="#{contatoEmergenciaController.contatoEmergenciaAlterar.parentesco}" id="txtParentesco" 
+                                             maxlength="20" required="true" label="nome"
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Parentesco" requiredMessage="O campo 'Parentesco' é de preenchimento obrigatorio." 
+                                             validatorMessage="O campo parentesco não pode conter numeros ou caracteres especiais!">
+                                    <f:validateRegex  pattern="^([A-Z,a-z, ,ã,á,à,â,ê,í,ú,õ,é,ü]){0,50}$" for="txtParentesco"/>
+                                    <p:watermark for="txtParentesco" value="Tio, Mãe, etc" />                               
+                                </p:inputText>
+
+                                <h:outputLabel value="Telefone 1*: " for="txtTelefone1"/>
+                                <p:inputMask id="txtTelefone1" mask="(99)9999-9999?9" label="Telefone 1" size="14" 
+                                             value="#{contatoEmergenciaController.contatoEmergenciaAlterar.telefone1}"
+                                             required="true" requiredMessage="É obrigatório informar ao menos um telefone.">
+                                    <p:watermark for="txtTelefone1" value="(00)0000-0000" />                                   
+                                </p:inputMask>
+
+                                <h:outputLabel value="Telefone 2: " for="txtTelefone2"/>
+                                <p:inputMask id="txtTelefone2" mask="(99)9999-9999?9" label="Telefone 2" size="14" 
+                                             value="#{contatoEmergenciaController.contatoEmergenciaAlterar.telefone2}">
+                                    <p:watermark for="txtTelefone2" value="(00)0000-0000" />                                   
+                                </p:inputMask>
+
+                                <h:outputLabel for="txtemail" value="E-Mail: "/>
+                                <p:inputText id="txtemail" label="E-Mail" size="25" value="#{contatoEmergenciaController.contatoEmergenciaAlterar.email}"
+                                             title="E-Mail" validator="#{cadastroUsuarioController.validarEspacoBranco}"
+                                             validatorMessage="E-Mail invalido!"
+                                             onkeyup="this.value = this.value.toLowerCase();
+                                                         this.value = this.value.trim();"> 
+                                    <f:validateLength minimum="5"/>
+                                    <p:watermark for="txtemail" value="exemplo@exemplo.com" />                                       
+                                </p:inputText>
+
+                                <h:outputLabel value="Descrição: " for="txtDescricao"/>
+                                <p:inputTextarea id="txtDescricao" maxlength="255" 
+                                                 rows="6" cols="24" counter="counter" counterTemplate="{0} caracteres restantes."
+                                                 value="#{contatoEmergenciaController.contatoEmergenciaAlterar.descricao}">
+                                    <p:watermark for="txtDescricao" value="Descreva informações que considere importante sobre a contato." />
+                                </p:inputTextarea>
+                                <p:spacer width="10" height="10"/>
+                                <h:outputText id="counter"/>
+
+                                <p:commandButton id="btnAlterar" value="Alterar"  
+                                                 oncomplete="altContatoEmergencia.hide();" update=":formContatoEmergencias:contatoEmergencias" actionListener="#{contatoEmergenciaController.alterarContatoEmergencia()}"/>
+                                <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="altContatoEmergencia.hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                </div>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

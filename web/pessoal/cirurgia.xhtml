@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./templeteAreaPessoal.xhtml">
+
+            <ui:define name="content">
+
+                <div align="center">
+
+                    <h:form id="formCirurgias" title="Cirurgias">
+
+                        <!--Todas as Cirurgias-->
+                        <p:dataTable id="cirurgias" var="cirurgia" paginator="true" paginatorPosition="bottom" rows="10" 
+                                     resizableColumns="true" emptyMessage="Não há cirurgias registradas."
+                                     value="#{cirurgiaController.cirurgias}" selection="#{cirurgiaController.cirurgiaSelecionada}" 
+                                     selectionMode="single" rowKey="#{cirurgia.id}" sortBy="#{cirurgia.dataOperacao}">
+
+                            <!--Evento para quando o item for selecionado-->
+                            <p:ajax event="rowSelect" update=":formCirurgias:pnlDesc" oncomplete="desc.show();"/>
+
+                            <f:facet name="header">
+                                Todas as Cirurgias
+                            </f:facet>
+
+                            <!--Coluna Local da Cirurgia-->
+                            <p:column headerText="Local Operado" sortBy="#{cirurgia.localOperado}" 
+                                      filterBy="#{cirurgia.localOperado}" id="localOperadoCirurgia">
+                                #{cirurgia.localOperado}
+                            </p:column>
+
+                            <!--Coluna ultima data Cirurgia-->
+                            <p:column headerText="Data da Cirurgia" sortBy="#{cirurgia.dataOperacao}" 
+                                      filterBy="#{cirurgia.dataOperacao}" id="dataOperacao">
+                                <h:outputText value="#{cirurgia.dataOperacao}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <!--Coluna data da adição-->
+                            <p:column headerText="Data Adição" resizable="false" sortBy="#{cirurgia.dataAdd}" 
+                                      filterBy="#{cirurgia.dataAdd}" id="dataAddCirurgia">
+                                <h:outputText value="#{cirurgia.dataAdd}">
+                                    <f:convertDateTime parent="dd/MM/yyyy" locale="pt,BR" timeZone="Brazil/East"/>
+                                </h:outputText>
+                            </p:column>                            
+
+                            <p:column headerText="Ações" style="width: 60px" resizable="false">
+                                <p:commandButton icon="ui-icon-pencil" style="width: 25px; height: 25px" 
+                                                 update=":dlgAltCirurgia" oncomplete="altCirurgia.show();" title="Alterar">
+                                    <f:setPropertyActionListener value="#{cirurgia.id}" target="#{cirurgiaController.cirurgiaAlterar.id}"/>
+                                    <f:setPropertyActionListener value="#{cirurgia.dataOperacao}" target="#{cirurgiaController.cirurgiaAlterar.dataOperacao}"/>
+                                    <f:setPropertyActionListener value="#{cirurgia.usuario}" target="#{cirurgiaController.cirurgiaAlterar.usuario}"/>
+                                    <f:setPropertyActionListener value="#{cirurgia.descricao}" target="#{cirurgiaController.cirurgiaAlterar.descricao}"/>
+                                    <f:setPropertyActionListener value="#{cirurgia.localOperado}" target="#{cirurgiaController.cirurgiaAlterar.localOperado}"/>
+                                    <f:setPropertyActionListener value="#{cirurgia.dataAdd}" target="#{cirurgiaController.cirurgiaAlterar.dataAdd}"/>
+                                </p:commandButton>
+
+                                <p:spacer height="10" width="10"/>
+
+                                <p:commandButton icon="ui-icon-trash" style="width: 25px; height: 25px"
+                                                 title="Excluir" onclick="confirmacao.show();">
+                                    <f:setPropertyActionListener value="#{cirurgia}" target="#{cirurgiaController.cirurgiaSelecionadaEA}"/>
+                                </p:commandButton>
+
+                                <!--Confirmação de exclusão-->
+                                <p:confirmDialog id="cdlgExcluirCirurgia" message="Tem certeza que deseja excluir essa cirurgia?"
+                                                 header="Excluir Cirurgia" severity="alert" widgetVar="confirmacao"
+                                                 closable="false">
+                                    <p:commandButton value="Sim" update=":formCirurgias:cirurgias" onclick="confirmacao.hide();"
+                                                     icon="ui-icon-check" actionListener="#{cirurgiaController.excluirCirurgia()}" />
+
+                                    <p:commandButton value="Não" onclick="confirmacao.hide();" icon="ui-icon-close"/>
+                                </p:confirmDialog>
+
+                            </p:column>                            
+
+
+                        </p:dataTable>
+
+                        <!--Dialog que mostra a descrição-->
+                        <p:dialog id="dlgDesc" header="Descrição" closable="true" draggable="false"
+                                  modal="true" resizable="false" widgetVar="desc">
+                            <p:scrollPanel>
+                                <h:panelGrid columns="1" id="pnlDesc">
+                                    <p:inputTextarea id="txtDesc" rows="10" cols="26" readonly="true"
+                                                     value="#{cirurgiaController.cirurgiaSelecionada.descricao}"/>
+                                </h:panelGrid>
+                            </p:scrollPanel>
+                        </p:dialog>
+
+                    </h:form>
+                    <!--Botão Adicinar Cirurgia-->
+                    <h:form id="acoesCirurgia" title="Acoes">
+                        <p:commandButton value="Adicionar" id="btnAdicionar" onclick="addCirurgia.show();"/>
+                    </h:form>
+
+                    <!--..................Formulario/Dialog Adicionar Cirurgia........................-->
+                    <p:dialog id="dlgAddCirurgia" header="Adicionar Cirurgia" closable="false" 
+                              modal="true" resizable="false" widgetVar="addCirurgia" dynamic="true">                             
+
+                        <h:form id="frmAddCirurgia">
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="Local Operado*: " for="txtNome"/>
+                                <p:inputText value="#{cirurgiaController.novaCirurgia.localOperado}" id="txtNome" 
+                                             maxlength="50" required="true" label="localOperado"
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="Local da Cirurgia" requiredMessage="O campo local operado é de preenchimento obrigatorio." >
+                                    <p:watermark for="txtNome" value="Digite o local do corpo operado." />
+                                </p:inputText>
+
+                                <h:outputLabel value="Data da Cirurgia: " for="txtDataOperacao"/>
+                                <p:calendar id="txtDataOperacao" size="10" locale="pt" pattern="dd/MM/yyyy"
+                                            title="Data da cirurgia" mindate="01/01/1900" showButtonPanel="true" value="#{cirurgiaController.novaCirurgia.dataOperacao}">
+                                    <p:watermark for="txtDataOperacao" value="dd/mm/aaaa" />       
+                                </p:calendar>
+
+                                <h:outputLabel value="Descrição: " for="txtDescricao"/>
+                                <p:inputTextarea id="txtDescricao" maxlength="255" 
+                                                 rows="6" cols="24" counter="counter" counterTemplate="{0} caracteres restantes."
+                                                 value="#{cirurgiaController.novaCirurgia.descricao}">
+                                    <p:watermark for="txtDescricao" value="Descreva informações que considere importante sobre a cirurgia." />
+                                </p:inputTextarea>
+                                <p:spacer width="10" height="10"/>
+                                <h:outputText id="counter"/>
+
+                                <p:commandButton id="btnAdicionar" value="Adicionar" update=":formCirurgias:cirurgias,:dlgAddCirurgia"
+                                                 actionListener="#{cirurgiaController.adicionarCirurgia()}" onsuccess="addCirurgia.hide();"/>
+                                <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="addCirurgia.hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <!--..................Formulario/Dialog Alterar Cirurgia..........................-->
+                    <p:dialog id="dlgAltCirurgia" header="Alterar Cirurgia" closable="false" 
+                              modal="true" resizable="false" widgetVar="altCirurgia" dynamic="true">                             
+
+                        <h:form id="frmAltCirurgia">
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="Local Operado*: " for="txtNome"/>
+                                <p:inputText value="#{cirurgiaController.cirurgiaAlterar.localOperado}" id="txtNome" label="local operado"
+                                             maxlength="25" required="true" 
+                                             validator="#{cadastroUsuarioController.validarEspacoBranco}" 
+                                             alt="local da Cirurgia" requiredMessage="O campo local operado é de preenchimento obrigatorio." />
+
+                                <h:outputLabel value="Data da Cirurgia: " for="txtDataOperacao"/>
+                                <p:calendar id="txtDataOperacao" size="10" locale="pt" pattern="dd/MM/yyyy"
+                                            title="Data da Cirurgia" mindate="01/01/1900" navigator="true" showButtonPanel="true" 
+                                            value="#{cirurgiaController.cirurgiaAlterar.dataOperacao}">
+                                    <p:watermark for="txtDataOperacao" value="dd/mm/aaaa" />       
+                                </p:calendar>
+
+                                <h:outputLabel value="Descrição: " for="txtDescricao"/>
+                                <p:inputTextarea id="txtDescricao" maxlength="255" 
+                                                 rows="6" cols="24" counter="counter" counterTemplate="{0} caracteres restantes."
+                                                 value="#{cirurgiaController.cirurgiaAlterar.descricao}"/>
+                                <p:spacer width="10" height="10"/>
+                                <h:outputText id="counter"/>
+
+                                <p:commandButton id="btnAlterar" value="Alterar"  
+                                                 oncomplete="altCirurgia.hide();" update=":formCirurgias:cirurgias" actionListener="#{cirurgiaController.alterarCirurgia()}"/>
+                                <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="altCirurgia.hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                </div>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

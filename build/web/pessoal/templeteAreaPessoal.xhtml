@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <noscript>
+            <meta http-equiv="Refresh" content="1; url=../jsFail.jsf"/>
+        </noscript>
+
+        <link rel="icon" href="../resources/imagens/icon.ico" type="image/ico" />        
+        <link href="./../resources/css/default.css" rel="stylesheet" type="text/css" />
+        <link href="./../resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
+        <link href="./../resources/css/meuCss.css" rel="stylesheet" type="text/css" />
+        <h:outputScript name="locale-primefaces.js" library="js"/>
+        <title>PROMEPE - #{homeController.usuarioLogado.nome}</title>
+    </h:head>
+
+    <h:body>
+        <p:ajaxStatus onstart="statusDialog.show();" onsuccess="statusDialog.hide();"/>
+        <p:dialog modal="true" widgetVar="statusDialog" header="Carregando..."
+                  draggable="false" resizable="false" closable="false">
+            <p:graphicImage value="../resources/imagens/loading.gif"/>
+
+        </p:dialog>
+
+        <!--Dialog Alterar Senha-->
+        <p:dialog id="dlgAltSenha" header="Alterar Senha" closable="false" 
+                  modal="true" resizable="false" widgetVar="altSenha" dynamic="true">                             
+
+            <h:form id="frmAltSenha">
+                <h:panelGrid columns="2">
+                    <h:outputLabel for="txtSenhaAntiga" value="Senha Antiga: "/>
+                    <p:password id="txtSenhaAntiga" label="Senha Antiga" size="35" required="true" value="#{homeController.senhaAntiga}" 
+                                requiredMessage="O campo senha antiga é de preenchimento obrigatório!" title="Senha Antiga" maxlength="14"
+                                validator="#{cadastroUsuarioController.validarEspacoBranco}">
+                        <f:validateLength minimum="6"/>
+                        <p:watermark for="txtSenhaAntiga" value="Minimo 6 caracteres" />                                       
+                    </p:password>
+
+                    <h:outputLabel for="txtSenhaNova" value="Nova Senha: "/>
+                    <p:password id="txtSenhaNova" label="Nova Senha" size="35" required="true" value="#{homeController.novaSenha}" 
+                                feedback="true" weakLabel="Fácil" goodLabel="Médio" strongLabel="Difícil" match="confsenha" 
+                                promptLabel="Digite a nova senha" requiredMessage="O campo nova senha é de preenchimento obrigatório!" title="Nova Senha" maxlength="14"
+                                validatorMessage="Os dois campos de senhas devem ser iguais e ter no mínimo 6 caracteres!" validator="#{cadastroUsuarioController.validarEspacoBranco}" >
+                        <f:validateLength minimum="6"/>
+                        <p:watermark for="txtSenhaNova" value="Minimo 6 caracteres" />                                       
+                    </p:password>
+
+                    <h:outputLabel for="confsenha" value="Repita Senha: *"/>
+                    <p:password id="confsenha" label="Repita Senha" size="35" required="true" value="#{homeController.novaSenha}" maxlength="14"
+                                requiredMessage="O campo confirmação da senha é de preenchimento obrigatório!" title="Confirmação da Senha">
+                        <p:watermark for="confsenha" value="Repita a senha" />                                   
+                    </p:password>                            
+
+                    <p:commandButton id="btnAlterarSenha" value="Alterar" 
+                                     actionListener="#{homeController.alterarSenha()}" onsuccess="altSenha.hide();"/>
+                    <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="altSenha.hide();"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>        
+
+        <!--Dialog Alterar E-Mail-->
+        <p:dialog id="dlgAltEmail" header="Alterar E-Mail" closable="false" 
+                  modal="true" resizable="false" widgetVar="altEmail" dynamic="true">                             
+
+            <h:form id="frmAltEmail">
+                <h:panelGrid columns="2">
+                    <h:outputLabel for="txtemail" value="E-Mail: "/>
+                    <p:inputText id="txtemail" label="E-Mail" size="35" required="true" value="#{homeController.novoEmail}"
+                                 requiredMessage="O campo e-mail é de preenchimento obrigatório!" title="E-Mail" validator="#{cadastroUsuarioController.validarEspacoBranco}"
+                                 validatorMessage="E-Mail invalido!"
+                                 onkeyup="this.value = this.value.toLowerCase();
+                                     this.value = this.value.trim();"> 
+                        <f:validateLength minimum="5"/>
+                        <p:watermark for="txtemail" value="Digite o novo e-mail" />                                       
+                    </p:inputText>
+
+                    <p:commandButton id="btnAlterarEmail" value="Alterar" 
+                                     actionListener="#{homeController.alterarEmail()}" onsuccess="altEmail.hide();"/>
+                    <p:commandButton id="btnCancelar" value="Cancelar" type="reset" onclick="altEmail.hide();"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+
+        <!--Dialog Desativar Conta-->
+
+        <p:confirmDialog id="cdlgDesativarConta" message="Tem certeza que deseja desativar sua conta?"
+                         header="Desativar Conta" severity="alert" widgetVar="confirmacao"
+                         closable="false">
+            <h:form id="frmDesativarConta">
+                <h:outputText style="font-weight: bolder" value="ATENÇÃO: Este processo é INREVERSIVEL!"/><br/>
+                <p:commandButton value="Sim" onclick="confirmacao.hide();"
+                                 icon="ui-icon-check" actionListener="#{homeController.desativarConta()}" />
+
+                <p:commandButton value="Não" onclick="confirmacao.hide();" icon="ui-icon-close"/>
+            </h:form>
+        </p:confirmDialog>
+
+
+        <!--Dialog Alterar Codigo Emergencia-->
+        <h:form id="frmAlterarCodigoEmergencia">
+            <p:confirmDialog id="cdlgDesativarContaEmergencia" message="Tem certeza que deseja alterar o código de emergência?"
+                             header="Desativar Conta" severity="alert" widgetVar="confirmacaoCodEme"
+                             closable="false">
+                <h:outputText value="ATENÇÃO: O código antigo passará a ser invalido!"/><br/>
+                <h:outputText style="font-weight: bolder" value="ATENÇÃO: Este processo é INREVERSIVEL!"/><br/>
+                <p:commandButton value="Sim" onclick="confirmacaoCodEme.hide();"
+                                 icon="ui-icon-check" actionListener="#{homeController.alterarCodigoEmergencia()}" />
+
+                <p:commandButton value="Não" onclick="confirmacaoCodEme.hide();" icon="ui-icon-close"/>
+            </p:confirmDialog>
+        </h:form>
+
+
+        <div id="top">
+            <ui:insert name="top">
+                <p:growl id="Msgs" sticky="true" autoUpdate="true"/>                
+
+                <a href="home.jsf">
+                    <img src="../resources/imagens/logo.gif" style="height: 80px"/>
+                </a>
+
+                <h:form id="frmMenu">
+                    <p:toolbar>
+                        <p:toolbarGroup>
+                            <p:commandButton value="Pagina Inicial" icon="ui-icon-home" action="#{homeController.iniciarTelaInterno()}" />
+
+                            <p:commandButton value="Vacinas" icon="ui-icon-pencil" action="#{vacinasController.iniciarTela()}"/>
+
+                            <p:commandButton value="Doenças Crônicas" icon="ui-icon-bullet" action="#{doencaCronicaController.iniciarTela()}"/>
+
+                            <p:commandButton value="Alergia" icon="ui-icon-star" action="#{alergiaController.iniciarTela()}"/>
+
+                            <p:commandButton value="Cirurgias" icon="ui-icon-heart" action="#{cirurgiaController.iniciarTela()}"/>
+                            
+                            <p:commandButton value="Medicamento Controlado" icon="ui-icon-notice" action="#{medicamentoControladoController.iniciarTela()}"/>
+                            
+                            <p:commandButton value="Contatos para Emergência" icon="ui-icon-mail-closed" action="#{contatoEmergenciaController.iniciarTela()}"/>
+                                                        
+                        </p:toolbarGroup>
+
+                        <p:toolbarGroup align="right">
+                            <p:separator/>
+
+                            <p:menuButton value="Configuração da Conta">
+                                <p:menuitem value="Alterar dados pessoais" url="./alterarInformacoesPessoais.jsf"/>
+                                <p:menuitem value="Alterar Senha" onclick="altSenha.show();"/>
+                                <p:menuitem value="Alterar E-Mail" onclick="altEmail.show();"/>
+                                <p:menuitem value="Alterar Código de Emergência" onclick="confirmacaoCodEme.show();"/>
+                                <p:separator/>
+                                <p:menuitem value="Desativar Conta" onclick="confirmacao.show();"/>
+                            </p:menuButton>
+
+                            <p:commandButton value="Sair" icon="ui-icon-power" action="#{homeController.deslogar()}"/>
+                        </p:toolbarGroup>
+                    </p:toolbar>
+
+                </h:form>
+            </ui:insert>
+        </div>
+
+        <div id="content" class="center_content" style="height: auto; min-height: 300px">
+            <ui:insert name="content">
+                Content
+            </ui:insert>
+        </div>
+
+        <div id="bottom">
+            <ui:insert name="bottom">
+                <div id="autoria" align="center">
+                    PROMEPE - Protuario Médico Pessoal<br/>
+                    <b>Protótipo de Sistema</b><br/>
+                    Desenvolvido por Arnaldo Frederico Guedes dos Reis<br/>
+                    Orientado por Fábio Rodrigues Barbosa<br/>
+                    TCC - Trabalhado de Conclusão de Cursos <br/>
+                    IFNMG - Campus Januária <br/>
+                    Cursos Superior em Tecnologia em Análise e Desenvolvimento de Sistemas
+                </div> 
+            </ui:insert>
+        </div>
+
+    </h:body>
+
+</html>
